@@ -3,10 +3,15 @@ const items = carousel.querySelectorAll(".carousel__item");
 const btnNext = document.querySelector(".carousel__btn-next");
 const btnPrev = document.querySelector(".carousel__btn-prev");
 const counterText = document.querySelector(".carousel__controls-text span");
+const width = window.innerWidth;
 
 const total = items.length;
-const visible = 3;
+let visible = 3;
 let index = 0;
+
+if (width <= 380) {
+  visible = 1;
+}
 
 function updateCarousel() {
   const shift = (100 / visible) * index;
@@ -59,11 +64,61 @@ btnPrev.addEventListener("click", () => {
   }
 });
 
-let auto = setInterval(nextSlide, 4000);
-
-function resetAuto() {
-  clearInterval(auto);
-  auto = setInterval(nextSlide, 4000);
-}
+setInterval(nextSlide, 4000);
 
 updateButtons();
+
+if (width <= 380) {
+  const btnNextText = document.querySelector(".table__btn-next");
+  const btnPrevText = document.querySelector(".table__btn-prev");
+  const slideItems = document.querySelectorAll(".slider-item");
+  const slideCircle = document.querySelectorAll(".circle");
+
+  let currentIndex = 0;
+  const totalText = 5;
+  let indx = 0;
+
+  function showItem(indx) {
+    const targetClass = `cell-${indx + 1}`;
+    slideItems.forEach((block, i) => {
+      if (block.classList.contains(targetClass)) {
+        block.classList.add("active");
+      } else {
+        block.classList.remove("active");
+      }
+    });
+
+    slideCircle.forEach((item, i) => {
+      item.classList.toggle("active", i === indx);
+    });
+  }
+
+  function updateButtonsText() {
+    if (currentIndex === 0) {
+      btnPrevText.classList.add("disabled");
+    } else {
+      btnPrevText.classList.remove("disabled");
+    }
+
+    if (currentIndex >= totalText - 1) {
+      btnNextText.classList.add("disabled");
+    } else {
+      btnNextText.classList.remove("disabled");
+    }
+  }
+
+  btnPrevText.addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + totalText) % totalText;
+    updateButtonsText();
+    showItem(currentIndex);
+  });
+
+  btnNextText.addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % totalText;
+    updateButtonsText();
+    showItem(currentIndex);
+  });
+
+  updateButtonsText();
+  showItem(currentIndex);
+}
